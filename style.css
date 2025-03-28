@@ -1,0 +1,75 @@
+ body {
+            font-family: 'Courier New', monospace;
+            background-color: #f4f4f9;
+            margin: 20px;
+            transition: background-color 0.3s, color 0.3s;
+        }
+        table {
+            width: 80%;
+            margin: 20px auto;
+            border-collapse: collapse;
+        }
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        th {
+            background-color: #4CAF50;
+            color: white;
+        }
+        select, button {
+            padding: 8px;
+            margin-top: 10px;
+            cursor: pointer;
+            border: none;
+            border-radius: 5px;
+        }
+        .container {
+            text-align: center;
+        }
+        .progress {
+            margin-top: 20px;
+            font-size: 18px;
+        }
+        .completed {
+            background-color: #d4edda !important;
+        }
+        /* Dark Mode (Hacker Theme) */
+        body.dark-mode {
+            background-color: #0f0f0f;
+            color: #00ff00;
+        }
+        .dark-mode table {
+            border: 1px solid #00ff00;
+        }
+        .dark-mode th {
+            background-color: #1a1a1a;
+            color: #00ff00;
+        }
+        .dark-mode td {
+            border-bottom: 1px solid #00ff00;
+        }
+        .dark-mode button {
+            background-color: #00ff00;
+            color: #0f0f0f;
+        }
+        .dark-mode select {
+            background-color: #1a1a1a;
+            color: #00ff00;
+            border: 1px solid #00ff00;
+        }
+        .dark-mode .completed {
+            background-color: #003300 !important;
+        }
+        .dark-mode #completion-percentage {
+            color: #00ff00;
+        }
+        .toggle-btn {
+            background-color: #00ff00;
+            color: #0f0f0f;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            margin-top: 10px;
+        }
