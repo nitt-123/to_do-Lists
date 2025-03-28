@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>DSA Schedule Tracker</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <style>
+        body {
+            font-family: 'Courier New', monospace;
+            background-color: #f4f4f9;
+            margin: 20px;
+            transition: background-color 0.3s, color 0.3s;
+        }
+        table {
+            width: 80%;
+            margin: 20px auto;
+            border-collapse: collapse;
+        }
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        th {
+            background-color: #4CAF50;
+            color: white;
+        }
+        select, button {
+            padding: 8px;
+            margin-top: 10px;
+            cursor: pointer;
+            border: none;
+            border-radius: 5px;
+        }
+        .container {
+            text-align: center;
+        }
+        .progress {
+            margin-top: 20px;
+            font-size: 18px;
+        }
+        .completed {
+            background-color: #d4edda !important;
+        }
+        /* Dark Mode (Hacker Theme) */
+        body.dark-mode {
+            background-color: #0f0f0f;
+            color: #00ff00;
+        }
+        .dark-mode table {
+            border: 1px solid #00ff00;
+        }
+        .dark-mode th {
+            background-color: #1a1a1a;
+            color: #00ff00;
+        }
+        .dark-mode td {
+            border-bottom: 1px solid #00ff00;
+        }
+        .dark-mode button {
+            background-color: #00ff00;
+            color: #0f0f0f;
+        }
+        .dark-mode select {
+            background-color: #1a1a1a;
+            color: #00ff00;
+            border: 1px solid #00ff00;
+        }
+        .dark-mode .completed {
+            background-color: #003300 !important;
+        }
+        .dark-mode #completion-percentage {
+            color: #00ff00;
+        }
+        .toggle-btn {
+            background-color: #00ff00;
+            color: #0f0f0f;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>DSA Schedule Tracker</h1>
+        <button class="toggle-btn" onclick="toggleDarkMode()">Toggle Hacker Mode</button>
+        <table id="schedule">
+            <thead>
+                <tr>
+                    <th>Week</th>
+                    <th>Date(s)</th>
+                    <th>Topic</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody id="schedule-body">
+                <!-- Data will be inserted dynamically -->
+            </tbody>
+        </table>
+        <button onclick="saveProgress()">Save Progress</button>
+        <button onclick="resetProgress()">Reset Progress</button>
+        <button onclick="downloadExcel()">Download Progress as Excel</button>
+        <div class="progress">
+            <p id="completion-percentage">Completion: 0%</p>
+        </div>
+    </div>
+
+    <script>
+        const scheduleData = [
+            {week: 'WEEK ONE', date: '22-03-2024', topic: 'DAA'},
+            {week: 'WEEK ONE', date: '23-03-2024', topic: 'MATHEMATICS'},
+            {week: 'WEEK ONE', date: '25-03-2024', topic: 'BIT MANIPULATIONS'},
+            {week: 'WEEK TWO', date: '26-03-2025', topic: 'RECURSIONS'},
+            {week: 'WEEK TWO', date: '27-29 MAR', topic: 'ARRAYS'},
+            {week: 'WEEK TWO', date: '30-31 MAR', topic: 'SEARCHING'},
+            {week: 'WEEK THREE', date: '3RD APR - 7 APR', topic: 'SORTING'},
+            {week: 'WEEK THREE', date: '8 APR', topic: 'MATRIX'},
+            {week: 'WEEK THREE', date: '9 APR - 11 APR', topic: 'HASHING'},
+            {week: 'WEEK FOUR', date: '12 APR - 13 APR', topic: 'STRINGS'},
+            {week: 'WEEK FOUR', date: '14 APR - 21 APR', topic: 'LINKED LISTS'},
+            {week: 'WEEK FIVE', date: '22 APR - 24 APR', topic: 'STACKS'},
+            {week: 'WEEK FIVE', date: '25 APR - 26 APR', topic: 'QUEUES'},
+            {week: 'WEEK FIVE', date: '27 APR - 29 APR', topic: 'TREES'},
+            {week: 'WEEK SIX', date: '30 APR - 2 MAY', topic: 'BST'},
+            {week: 'WEEK SIX', date: '3 MAY', topic: 'HEAPS'},
+            {week: 'WEEK SIX', date: '4 MAY - 6 MAY', topic: 'GRAPHS'},
+            {week: 'WEEK SEVEN', date: '7 MAY', topic: 'GREEDY'},
+            {week: 'WEEK SEVEN', date: '8 MAY', topic: 'BACKTRACKING'},
+            {week: 'WEEK SEVEN', date: '9 MAY - 13 MAY', topic: 'DP'},
+            {week: 'WEEK EIGHT', date: '14 MAY', topic: 'TRIES AND DSUs'},
+            {week: 'WEEK EIGHT', date: '15 MAY', topic: 'SEGMENT TREES'},
+            {week: 'WEEK NINE', date: '16 MAY - 18 MAY', topic: 'GRAPH ALGORITHMS'},
+            {week: 'WEEK NINE', date: '19 MAY - 21 MAY', topic: 'DISJOINT SET UNION'},
+            {week: 'WEEK TEN', date: '22 MAY - 25 MAY', topic: 'ADVANCED DP'},
+            {week: 'WEEK TEN', date: '26 MAY', topic: 'INTERVIEW PROBLEMS'}
+        ];
+
+        // Load data and generate the table
+        function loadSchedule() {
+            const tbody = document.getElementById('schedule-body');
+            tbody.innerHTML = '';
+            scheduleData.forEach((item, index) => {
+                const status = localStorage.getItem(`status_${index}`) || 'Pending';
+                const rowClass = status === 'Completed' ? 'completed' : '';
+                tbody.innerHTML += `
+                    <tr class="${rowClass}">
+                        <td>${item.week}</td>
+                        <td>${item.date}</td>
+                        <td>${item.topic}</td>
+                        <td>
+                            <select id="status_${index}" onchange="updateProgress()">
+                                <option value="Pending" ${status === 'Pending' ? 'selected' : ''}>Pending</option>
+                                <option value="In Progress" ${status === 'In Progress' ? 'selected' : ''}>In Progress</option>
+                                <option value="Completed" ${status === 'Completed' ? 'selected' : ''}>Completed</option>
+                            </select>
+                        </td>
+                    </tr>
+                `;
+            });
+            updateProgress();
+        }
+
+        // Save progress to local storage
+        function saveProgress() {
+            scheduleData.forEach((item, index) => {
+                const status = document.getElementById(`status_${index}`).value;
+                localStorage.setItem(`status_${index}`, status);
+            });
+            alert('Progress saved successfully!');
+        }
+
+        // Reset progress
+        function resetProgress() {
+            if (confirm('Are you sure you want to reset all progress?')) {
+                scheduleData.forEach((item, index) => {
+                    localStorage.removeItem(`status_${index}`);
+                });
+                loadSchedule();
+                alert('Progress has been reset.');
+            }
+        }
+
+        // Update progress percentage
+        function updateProgress() {
+            let completedCount = 0;
+            scheduleData.forEach((item, index) => {
+                const status = document.getElementById(`status_${index}`).value;
+                if (status === 'Completed') {
+                    completedCount++;
+                    document.querySelector(`#status_${index}`).closest('tr').classList.add('completed');
+                } else {
+                    document.querySelector(`#status_${index}`).closest('tr').classList.remove('completed');
+                }
+            });
+            const percentage = ((completedCount / scheduleData.length) * 100).toFixed(2);
+            document.getElementById('completion-percentage').innerText = `Completion: ${percentage}%`;
+        }
+
+        // Download progress as Excel
+        function downloadExcel() {
+            const data = scheduleData.map((item, index) => {
+                return {
+                    Week: item.week,
+                    Date: item.date,
+                    Topic: item.topic,
+                    Status: document.getElementById(`status_${index}`).value
+                };
+            });
+
+            const worksheet = XLSX.utils.json_to_sheet(data);
+            const workbook = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(workbook, worksheet, "DSA Progress");
+
+            XLSX.writeFile(workbook, "dsa_schedule_progress.xlsx");
+        }
+
+        // Toggle Dark Mode (Hacker Theme)
+        function toggleDarkMode() {
+            document.body.classList.toggle('dark-mode');
+        }
+
+        // Load schedule on page load
+        window.onload = loadSchedule;
+    </script>
+</body>
+</html>
